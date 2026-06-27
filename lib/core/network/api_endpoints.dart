@@ -3,7 +3,7 @@ class ApiEndpoints {
 
   /// Parent Hub
 
-  static const parentHubBaseUrl = 'https://hub.nexorait.lk/api';
+  static const parentHubBaseUrl = 'http://10.189.147.230:9000/api';
 
   //https://hub.nexorait.lk/api
 
@@ -17,6 +17,7 @@ class ApiEndpoints {
 
   static const String parentDashboard = '/api/parent/v1/dashboard';
   static const String parentAttendance = '/api/parent/v1/attendance';
+  static const String parentPayment = '/api/parent/v1/payments';
 
   /// Firebase Cloud Messaging
 

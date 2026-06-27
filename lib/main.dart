@@ -1,3 +1,5 @@
+// lib/main.dart
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -14,31 +16,116 @@ import 'features/attendance/presentation/bloc/attendance/attendance_bloc.dart';
 import 'features/auth/presentation/bloc/auth/auth_bloc.dart';
 import 'features/home/presentation/bloc/dashboard/dashboard_bloc.dart';
 import 'features/notification/presentation/bloc/notification/notification_bloc.dart';
+import 'features/payments/presentation/bloc/payment/payment_bloc.dart';
 
 Future<void> main() async {
+  // Ensure all async operations are completed
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  try {
+    // =========================================================
+    // 1. FIREBASE INITIALIZATION
+    // =========================================================
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    debugPrint('✅ Firebase initialized');
 
-  await NotificationService.instance.initialize();
+    // =========================================================
+    // 2. FIREBASE MESSAGING
+    // =========================================================
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    debugPrint('✅ Firebase Messaging handler set');
 
-  await FCMService.instance.initialize();
+    // =========================================================
+    // 3. NOTIFICATION SERVICE
+    // =========================================================
+    await NotificationService.instance.initialize();
+    debugPrint('✅ Notification service initialized');
 
-  await TimezoneService.initialize();
-  await StorageService.init();
+    // =========================================================
+    // 4. FCM SERVICE
+    // =========================================================
+    await FCMService.instance.initialize();
+    debugPrint('✅ FCM service initialized');
 
-  await init();
+    // =========================================================
+    // 5. TIMEZONE SERVICE
+    // =========================================================
+    await TimezoneService.initialize();
+    debugPrint('✅ Timezone service initialized');
 
-  runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => sl<AuthBloc>()),
-        BlocProvider(create: (_) => sl<NotificationBloc>()),
-        BlocProvider(create: (_) => sl<DashboardBloc>()),
-        BlocProvider(create: (_) => sl<AttendanceBloc>()),
-      ],
-      child: const App(),
-    ),
-  );
+    // =========================================================
+    // 6. STORAGE SERVICE
+    // =========================================================
+    await StorageService.init();
+    debugPrint('✅ Storage service initialized');
+
+    // =========================================================
+    // 7. DEPENDENCY INJECTION
+    // =========================================================
+    await init();
+    debugPrint('✅ Dependency injection initialized');
+
+    // =========================================================
+    // 8. RUN APP
+    // =========================================================
+    runApp(
+      MultiBlocProvider(providers: _getBlocProviders(), child: const App()),
+    );
+    debugPrint('✅ App started successfully');
+  } catch (e, stackTrace) {
+    // Log any initialization errors
+    debugPrint('❌ Initialization error: $e');
+    debugPrint('Stack trace: $stackTrace');
+
+    // Show error screen
+    runApp(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Failed to initialize app',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    e.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Retry initialization
+                      main();
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Get all BLoC providers
+List<BlocProvider> _getBlocProviders() {
+  return [
+    BlocProvider<AuthBloc>(create: (context) => sl<AuthBloc>()),
+    BlocProvider<NotificationBloc>(create: (context) => sl<NotificationBloc>()),
+    BlocProvider<DashboardBloc>(create: (context) => sl<DashboardBloc>()),
+    BlocProvider<AttendanceBloc>(create: (context) => sl<AttendanceBloc>()),
+    BlocProvider<PaymentBloc>(create: (context) => sl<PaymentBloc>()),
+  ];
 }
