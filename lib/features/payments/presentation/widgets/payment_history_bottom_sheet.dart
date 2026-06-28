@@ -14,9 +14,6 @@ class PaymentHistoryBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
-
     return DraggableScrollableSheet(
       initialChildSize: 0.92,
       minChildSize: 0.5,
