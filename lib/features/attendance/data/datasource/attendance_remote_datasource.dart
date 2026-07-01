@@ -35,7 +35,7 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
 
     final response = await apiClient.post(
       ApiEndpoints.parentAttendance,
-      data: {'student_id': 2},
+      data: {'student_id': studentId},
     );
 
     final result = AttendanceResponseModel.fromJson(response);

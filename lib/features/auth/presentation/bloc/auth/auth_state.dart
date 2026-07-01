@@ -20,6 +20,24 @@ final class AuthSuccess extends AuthState {
   List<Object?> get props => [loginResponse];
 }
 
+class ChangePasswordSuccess extends AuthState {
+  final String message;
+
+  const ChangePasswordSuccess({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+final class LogoutSuccess extends AuthState {
+  final String message;
+
+  const LogoutSuccess({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
 final class AuthFailure extends AuthState {
   final String message;
 

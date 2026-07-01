@@ -8,6 +8,23 @@ class DeviceInfoService {
 
   static final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
 
+  /// Device ID
+  static Future<String> getDeviceId() async {
+    if (Platform.isAndroid) {
+      final info = await _deviceInfo.androidInfo;
+
+      return info.id; // හෝ info.serial නොවෙයි
+    }
+
+    if (Platform.isIOS) {
+      final info = await _deviceInfo.iosInfo;
+
+      return info.identifierForVendor ?? 'unknown';
+    }
+
+    return 'unknown';
+  }
+
   /// Device Name
   static Future<String> getDeviceName() async {
     if (Platform.isAndroid) {

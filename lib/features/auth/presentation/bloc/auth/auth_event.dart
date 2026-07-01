@@ -21,3 +21,19 @@ class LoginRequested extends AuthEvent {
 class SaveFcmTokenRequested extends AuthEvent {
   const SaveFcmTokenRequested();
 }
+
+class ChangePasswordRequested extends AuthEvent {
+
+  final ChangePasswordRequest request;
+
+  const ChangePasswordRequested({
+    required this.request,
+  });
+
+  @override
+  List<Object?> get props => [request];
+}
+
+class LogoutRequested extends AuthEvent {
+  const LogoutRequested();
+}

@@ -13,9 +13,9 @@ class DashboardResponseModel {
 
   factory DashboardResponseModel.fromJson(Map<String, dynamic> json) {
     return DashboardResponseModel(
-      status: json["status"],
-      message: json["message"],
-      data: DashboardDataModel.fromJson(json["data"]),
+      status: json["status"] ?? false,
+      message: json["message"] ?? "",
+      data: DashboardDataModel.fromJson(json["data"] ?? {}),
     );
   }
 }

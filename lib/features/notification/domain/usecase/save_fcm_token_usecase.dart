@@ -1,5 +1,5 @@
-import '../../data/model/save_fcm_token_request.dart';
-import '../../data/model/save_fcm_token_response.dart';
+import '../../data/model/fcm/save_fcm_token_request.dart';
+import '../../data/model/fcm/save_fcm_token_response.dart';
 import '../repository/notification_repository.dart';
 
 class SaveFcmTokenUseCase {

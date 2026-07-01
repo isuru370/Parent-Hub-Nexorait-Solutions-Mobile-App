@@ -1,6 +1,7 @@
 class SaveFcmTokenRequest {
   final int studentId;
   final String token;
+  final String deviceId;
   final String deviceName;
   final String deviceType;
   final String appVersion;
@@ -8,6 +9,7 @@ class SaveFcmTokenRequest {
   const SaveFcmTokenRequest({
     required this.studentId,
     required this.token,
+    required this.deviceId,
     required this.deviceName,
     required this.deviceType,
     required this.appVersion,
@@ -17,6 +19,7 @@ class SaveFcmTokenRequest {
     return {
       'student_id': studentId,
       'token': token,
+      'device_id': deviceId,
       'device_name': deviceName,
       'device_type': deviceType,
       'app_version': appVersion,

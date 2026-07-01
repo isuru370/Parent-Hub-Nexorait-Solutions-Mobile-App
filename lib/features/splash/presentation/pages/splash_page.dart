@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/routes/route_names.dart';
+import '../../../../core/services/update_service.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_service.dart';
 
@@ -16,6 +17,8 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  final UpdateService _updateService = UpdateService();
+
   @override
   void initState() {
     super.initState();
@@ -23,6 +26,12 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> _initialize() async {
+    bool updating = await _updateService.checkForUpdate();
+
+    if (updating) {
+      return;
+    }
+
     await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;

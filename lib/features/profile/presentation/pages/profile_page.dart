@@ -1,12 +1,16 @@
 // lib/features/profile/presentation/pages/profile_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_fonts.dart';
+import '../../../../core/routes/route_names.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_service.dart';
 import '../../../auth/data/model/student_model.dart';
+import '../../../auth/presentation/bloc/auth/auth_bloc.dart';
 import 'widgets/profile_header.dart';
 import 'widgets/profile_info_card.dart';
 import 'widgets/profile_menu_item.dart';
@@ -41,93 +45,81 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: _student == null
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primaryBlue),
-            )
-          : CustomScrollView(
-              slivers: [
-                // Profile Header
-                SliverToBoxAdapter(child: ProfileHeader(student: _student!)),
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is LogoutSuccess) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
 
-                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+          context.go(RouteNames.login);
+        }
 
-                // Stats Row
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: ProfileStatCard(
-                            label: 'Grade',
-                            value: _student!.gradeName ?? 'N/A',
-                            icon: Icons.school,
-                            color: AppColors.primaryBlue,
+        if (state is AuthFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: _student == null
+            ? const Center(
+                child: CircularProgressIndicator(color: AppColors.primaryBlue),
+              )
+            : CustomScrollView(
+                slivers: [
+                  // Profile Header
+                  SliverToBoxAdapter(child: ProfileHeader(student: _student!)),
+
+                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+                  // Stats Row
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ProfileStatCard(
+                              label: 'Grade',
+                              value: _student!.gradeName ?? 'N/A',
+                              icon: Icons.school,
+                              color: AppColors.primaryBlue,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ProfileStatCard(
-                            label: 'Student ID',
-                            value: _student!.customId,
-                            icon: Icons.badge,
-                            color: AppColors.primaryOrange,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ProfileStatCard(
+                              label: 'Student ID',
+                              value: _student!.customId,
+                              icon: Icons.badge,
+                              color: AppColors.primaryOrange,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SliverToBoxAdapter(child: SizedBox(height: 12)),
-
-                // ✅ Temporary ID Card
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: TemporaryIdCard(student: _student!),
-                  ),
-                ),
-
-                const SliverToBoxAdapter(child: SizedBox(height: 12)),
-
-                // Personal Information Section
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      'Personal Information',
-                      style: TextStyle(
-                        fontFamily: AppFonts.heading,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        ],
                       ),
                     ),
                   ),
-                ),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: ProfileInfoCard(student: _student!),
+                  // ✅ Temporary ID Card
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TemporaryIdCard(student: _student!),
+                    ),
                   ),
-                ),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
-                // Guardian Information Section
-                if (_student!.hasGuardian)
+                  // Personal Information Section
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'Guardian Information',
+                        'Personal Information',
                         style: TextStyle(
                           fontFamily: AppFonts.heading,
                           fontSize: 18,
@@ -138,131 +130,155 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
 
-                if (_student!.hasGuardian)
                   const SliverToBoxAdapter(child: SizedBox(height: 8)),
 
-                if (_student!.hasGuardian)
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: _buildGuardianCard(),
+                      child: ProfileInfoCard(student: _student!),
                     ),
                   ),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
-                // Academic Details Section
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      'Academic Details',
-                      style: TextStyle(
-                        fontFamily: AppFonts.heading,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SliverToBoxAdapter(child: SizedBox(height: 8)),
-
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildAcademicCard(),
-                  ),
-                ),
-
-                const SliverToBoxAdapter(child: SizedBox(height: 12)),
-
-                // Settings Section
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      'Settings',
-                      style: TextStyle(
-                        fontFamily: AppFonts.heading,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SliverToBoxAdapter(child: SizedBox(height: 8)),
-
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(
-                          color: AppColors.border.withOpacity(0.5),
-                          width: 1,
+                  // Guardian Information Section
+                  if (_student!.hasGuardian)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'Guardian Information',
+                          style: TextStyle(
+                            fontFamily: AppFonts.heading,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          ProfileMenuItem(
-                            icon: Icons.edit,
-                            title: 'Edit Profile',
-                            subtitle: 'Update your personal information',
-                            onTap: () {
-                              // Navigate to edit profile
-                            },
-                          ),
-                          const Divider(height: 1, indent: 56),
-                          ProfileMenuItem(
-                            icon: Icons.lock,
-                            title: 'Change Password',
-                            subtitle: 'Update your account password',
-                            onTap: () {
-                              // Navigate to change password
-                            },
-                          ),
-                          const Divider(height: 1, indent: 56),
-                          ProfileMenuItem(
-                            icon: Icons.notifications,
-                            title: 'Notifications',
-                            subtitle: 'Manage notification preferences',
-                            onTap: () {
-                              // Navigate to notification settings
-                            },
-                          ),
-                          const Divider(height: 1, indent: 56),
-                          ProfileMenuItem(
-                            icon: Icons.help,
-                            title: 'Help & Support',
-                            subtitle: 'Get help or contact support',
-                            onTap: () {
-                              // Navigate to help page
-                            },
-                          ),
-                          const Divider(height: 1, indent: 56),
-                          ProfileMenuItem(
-                            icon: Icons.logout,
-                            title: 'Logout',
-                            subtitle: 'Sign out from your account',
-                            onTap: _showLogoutDialog,
-                            iconColor: AppColors.error,
-                            textColor: AppColors.error,
-                          ),
-                        ],
+                    ),
+
+                  if (_student!.hasGuardian)
+                    const SliverToBoxAdapter(child: SizedBox(height: 8)),
+
+                  if (_student!.hasGuardian)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: _buildGuardianCard(),
+                      ),
+                    ),
+
+                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
+
+                  // Academic Details Section
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Academic Details',
+                        style: TextStyle(
+                          fontFamily: AppFonts.heading,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 80)),
-              ],
-            ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
+
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: _buildAcademicCard(),
+                    ),
+                  ),
+
+                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
+
+                  // Settings Section
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Settings',
+                        style: TextStyle(
+                          fontFamily: AppFonts.heading,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
+
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: AppColors.border.withOpacity(0.5),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            ProfileMenuItem(
+                              icon: Icons.lock,
+                              title: 'Change Password',
+                              subtitle: 'Update your account password',
+                              onTap: () {
+                                // Navigate to change password
+                                context.push(
+                                  RouteNames.profile +
+                                      RouteNames.changePassword,
+                                );
+                              },
+                            ),
+                            const Divider(height: 1, indent: 56),
+                            ProfileMenuItem(
+                              icon: Icons.notifications,
+                              title: 'Notifications',
+                              subtitle: 'Manage notification preferences',
+                              onTap: () {
+                                context.push(RouteNames.notifications);
+                              },
+                            ),
+                            const Divider(height: 1, indent: 56),
+                            ProfileMenuItem(
+                              icon: Icons.help,
+                              title: 'Help & Support',
+                              subtitle: 'Get help or contact support',
+                              onTap: () {
+                                // Navigate to help page
+                              },
+                            ),
+                            const Divider(height: 1, indent: 56),
+                            ProfileMenuItem(
+                              icon: Icons.logout,
+                              title: 'Logout',
+                              subtitle: 'Sign out from your account',
+                              onTap: _showLogoutDialog,
+                              iconColor: AppColors.error,
+                              textColor: AppColors.error,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SliverToBoxAdapter(child: SizedBox(height: 80)),
+                ],
+              ),
+      ),
     );
   }
 
@@ -434,20 +450,20 @@ class _ProfilePageState extends State<ProfilePage> {
   void _showLogoutDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Logout'),
         content: const Text('Are you sure you want to logout?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
-              // Logout logic
-              // context.read<AuthBloc>().add(LogoutEvent());
+              Navigator.pop(dialogContext);
+
+              context.read<AuthBloc>().add(const LogoutRequested());
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,

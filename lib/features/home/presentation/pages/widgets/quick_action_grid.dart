@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/routes/route_names.dart';
 
 class QuickActionGrid extends StatelessWidget {
   const QuickActionGrid({super.key});
@@ -60,7 +62,7 @@ class QuickActionGrid extends StatelessWidget {
             AppColors.profileCard.withOpacity(0.7),
           ],
           onTap: () {
-            // TODO Navigate Profile
+            
           },
         ),
       ],

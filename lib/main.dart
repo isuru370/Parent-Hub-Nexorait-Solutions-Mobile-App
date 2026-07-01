@@ -14,9 +14,13 @@ import 'core/services/timezone_service.dart';
 import 'core/storage/storage_service.dart';
 import 'features/attendance/presentation/bloc/attendance/attendance_bloc.dart';
 import 'features/auth/presentation/bloc/auth/auth_bloc.dart';
+import 'features/exams/presentation/bloc/exam/exam_bloc.dart';
 import 'features/home/presentation/bloc/dashboard/dashboard_bloc.dart';
 import 'features/notification/presentation/bloc/notification/notification_bloc.dart';
 import 'features/payments/presentation/bloc/payment/payment_bloc.dart';
+import 'features/results/presentation/bloc/result/result_bloc.dart';
+import 'features/schedules/presentation/bloc/schedule/schedule_bloc.dart';
+import 'features/teachers/presentation/bloc/teacher/teacher_bloc.dart';
 
 Future<void> main() async {
   // Ensure all async operations are completed
@@ -127,5 +131,9 @@ List<BlocProvider> _getBlocProviders() {
     BlocProvider<DashboardBloc>(create: (context) => sl<DashboardBloc>()),
     BlocProvider<AttendanceBloc>(create: (context) => sl<AttendanceBloc>()),
     BlocProvider<PaymentBloc>(create: (context) => sl<PaymentBloc>()),
+    BlocProvider<ExamBloc>(create: (context) => sl<ExamBloc>()),
+    BlocProvider<ResultBloc>(create: (context) => sl<ResultBloc>()),
+    BlocProvider<TeacherBloc>(create: (context) => sl<TeacherBloc>()),
+    BlocProvider<ScheduleBloc>(create: (context) => sl<ScheduleBloc>()),
   ];
 }

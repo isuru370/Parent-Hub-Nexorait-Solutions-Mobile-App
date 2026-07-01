@@ -1,7 +1,7 @@
 name: parent_hub
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.2+3
+version: 1.0.4+5
 
 environment:
   sdk: ^3.9.2
@@ -26,6 +26,7 @@ dependencies:
   intl: ^0.20.3
   flutter_launcher_icons: ^0.14.4
   cached_network_image: ^3.4.1
+  in_app_update: ^4.2.5
 
 dev_dependencies:
   flutter_test:

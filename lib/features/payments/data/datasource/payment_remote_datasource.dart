@@ -37,7 +37,7 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
 
     final response = await apiClient.post(
       ApiEndpoints.parentPayment,
-      data: {'student_id': 1},
+      data: {'student_id': studentId},
     );
 
     final result = PaymentResponseModel.fromJson(response);

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/routes/route_names.dart';
 import '../bloc/dashboard/dashboard_bloc.dart';
 import 'widgets/banner_card.dart';
 import 'widgets/payment_section.dart';
@@ -217,57 +219,75 @@ class _HomePageState extends State<HomePage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               //-----------------------------------
-                              // Notification
+                              // Notification Button (With Count)
                               //-----------------------------------
-                              Container(
-                                width: 52,
-                                height: 52,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.shade200,
-                                      blurRadius: 10,
-                                      spreadRadius: 2,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    const Center(
-                                      child: Icon(
-                                        Icons.notifications_outlined,
-                                        color: AppColors.textPrimary,
-                                        size: 25,
+                              InkWell(
+                                onTap: () {
+                                  // ✅ Navigate to Notification List Page
+                                  context.push(RouteNames.notifications);
+                                },
+                                borderRadius: BorderRadius.circular(30),
+                                child: Container(
+                                  width: 52,
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.shade200,
+                                        blurRadius: 10,
+                                        spreadRadius: 2,
+                                        offset: const Offset(0, 4),
                                       ),
-                                    ),
-
-                                    Positioned(
-                                      right: 2,
-                                      top: 2,
-                                      child: Container(
-                                        width: 18,
-                                        height: 18,
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.error,
-                                          shape: BoxShape.circle,
+                                    ],
+                                  ),
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      const Center(
+                                        child: Icon(
+                                          Icons.notifications_outlined,
+                                          color: AppColors.textPrimary,
+                                          size: 25,
                                         ),
-                                        child: const Center(
-                                          child: Text(
-                                            "3",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 9,
-                                              fontWeight: FontWeight.bold,
+                                      ),
+
+                                      // ✅ Notification Badge
+                                      if (dashboard.notification.unreadCount >
+                                          0)
+                                        Positioned(
+                                          right: 2,
+                                          top: 2,
+                                          child: Container(
+                                            width: 20,
+                                            height: 20,
+                                            decoration: const BoxDecoration(
+                                              color: AppColors.error,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                dashboard
+                                                            .notification
+                                                            .unreadCount >
+                                                        9
+                                                    ? '9+'
+                                                    : dashboard
+                                                          .notification
+                                                          .unreadCount
+                                                          .toString(),
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
 
@@ -276,32 +296,36 @@ class _HomePageState extends State<HomePage> {
                               //-----------------------------------
                               // Profile
                               //-----------------------------------
-                              Container(
-                                padding: const EdgeInsets.all(3),
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      AppColors.primaryBlue,
-                                      AppColors.darkBlue,
-                                      AppColors.primaryOrange,
+                              InkWell(
+                                onTap: () {
+                                  context.go(RouteNames.profile);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        AppColors.primaryBlue,
+                                        AppColors.darkBlue,
+                                        AppColors.primaryOrange,
+                                      ],
+                                    ),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.primaryBlue
+                                            .withOpacity(.25),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
                                     ],
                                   ),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.primaryBlue.withOpacity(
-                                        .25,
-                                      ),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 4),
+                                  child: CircleAvatar(
+                                    radius: 24,
+                                    backgroundColor: Colors.white,
+                                    backgroundImage: NetworkImage(
+                                      dashboard.student.imgUrl,
                                     ),
-                                  ],
-                                ),
-                                child: CircleAvatar(
-                                  radius: 24,
-                                  backgroundColor: Colors.white,
-                                  backgroundImage: NetworkImage(
-                                    dashboard.student.imgUrl,
                                   ),
                                 ),
                               ),
@@ -338,21 +362,6 @@ class _HomePageState extends State<HomePage> {
                                   color: AppColors.textPrimary,
                                 ),
                           ),
-                          TextButton(
-                            onPressed: () {
-                              // Navigate to all classes
-                            },
-                            style: TextButton.styleFrom(
-                              foregroundColor: AppColors.primaryBlue,
-                            ),
-                            child: const Text(
-                              'View All',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -375,7 +384,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           TextButton(
                             onPressed: () {
-                              // Navigate to all exams
+                              context.push('${RouteNames.dashboard}/exams');
                             },
                             style: TextButton.styleFrom(
                               foregroundColor: AppColors.primaryBlue,
@@ -411,6 +420,7 @@ class _HomePageState extends State<HomePage> {
                           TextButton(
                             onPressed: () {
                               // Navigate to weekly schedule
+                              context.push('${RouteNames.dashboard}/schedule');
                             },
                             style: TextButton.styleFrom(
                               foregroundColor: AppColors.primaryBlue,
@@ -446,6 +456,7 @@ class _HomePageState extends State<HomePage> {
                           TextButton(
                             onPressed: () {
                               // Navigate to payments
+                              context.go(RouteNames.payments);
                             },
                             style: TextButton.styleFrom(
                               foregroundColor: AppColors.primaryBlue,

@@ -18,6 +18,9 @@ class ApiClient {
     ),
   );
 
+  // ============================================
+  // POST
+  // ============================================
   Future<Map<String, dynamic>> post(
     String endpoint, {
     Map<String, dynamic>? data,
@@ -42,15 +45,25 @@ class ApiClient {
     }
   }
 
-  Future<Map<String, dynamic>> get(String endpoint) async {
+  // ============================================
+  // GET (WITH QUERY PARAMS)
+  // ============================================
+  Future<Map<String, dynamic>> get(
+    String endpoint, {
+    Map<String, dynamic>? queryParams,
+  }) async {
     try {
       final url = _buildUrl(endpoint);
 
       debugPrint('==================== API REQUEST ====================');
       debugPrint('METHOD : GET');
       debugPrint('URL    : $url');
+      debugPrint('QUERY  : $queryParams');
 
-      final response = await _dio.get(url);
+      final response = await _dio.get(
+        url,
+        queryParameters: queryParams,
+      );
 
       debugPrint('==================== API RESPONSE ====================');
       debugPrint('STATUS : ${response.statusCode}');
@@ -62,6 +75,105 @@ class ApiClient {
     }
   }
 
+  // ============================================
+  // DELETE
+  // ============================================
+  Future<Map<String, dynamic>> delete(
+    String endpoint, {
+    Map<String, dynamic>? queryParams,
+  }) async {
+    try {
+      final url = _buildUrl(endpoint);
+
+      debugPrint('==================== API REQUEST ====================');
+      debugPrint('METHOD : DELETE');
+      debugPrint('URL    : $url');
+      debugPrint('QUERY  : $queryParams');
+
+      final response = await _dio.delete(
+        url,
+        queryParameters: queryParams,
+      );
+
+      debugPrint('==================== API RESPONSE ====================');
+      debugPrint('STATUS : ${response.statusCode}');
+      debugPrint('DATA   : ${response.data}');
+
+      return Map<String, dynamic>.from(response.data);
+    } on DioException catch (e) {
+      _handleError(e);
+    }
+  }
+
+  // ============================================
+  // PUT
+  // ============================================
+  Future<Map<String, dynamic>> put(
+    String endpoint, {
+    Map<String, dynamic>? data,
+    Map<String, dynamic>? queryParams,
+  }) async {
+    try {
+      final url = _buildUrl(endpoint);
+
+      debugPrint('==================== API REQUEST ====================');
+      debugPrint('METHOD : PUT');
+      debugPrint('URL    : $url');
+      debugPrint('BODY   : $data');
+      debugPrint('QUERY  : $queryParams');
+
+      final response = await _dio.put(
+        url,
+        data: data,
+        queryParameters: queryParams,
+      );
+
+      debugPrint('==================== API RESPONSE ====================');
+      debugPrint('STATUS : ${response.statusCode}');
+      debugPrint('DATA   : ${response.data}');
+
+      return Map<String, dynamic>.from(response.data);
+    } on DioException catch (e) {
+      _handleError(e);
+    }
+  }
+
+  // ============================================
+  // PATCH
+  // ============================================
+  Future<Map<String, dynamic>> patch(
+    String endpoint, {
+    Map<String, dynamic>? data,
+    Map<String, dynamic>? queryParams,
+  }) async {
+    try {
+      final url = _buildUrl(endpoint);
+
+      debugPrint('==================== API REQUEST ====================');
+      debugPrint('METHOD : PATCH');
+      debugPrint('URL    : $url');
+      debugPrint('BODY   : $data');
+      debugPrint('QUERY  : $queryParams');
+
+      final response = await _dio.patch(
+        url,
+        data: data,
+        queryParameters: queryParams,
+      );
+
+      debugPrint('==================== API RESPONSE ====================');
+      debugPrint('STATUS : ${response.statusCode}');
+      debugPrint('DATA   : ${response.data}');
+
+      return Map<String, dynamic>.from(response.data);
+    } on DioException catch (e) {
+      _handleError(e);
+    }
+  }
+
+  // ============================================
+  // BUILD URL
+  // ============================================
   String _buildUrl(String endpoint) {
     if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
       return endpoint;
@@ -77,6 +189,9 @@ class ApiClient {
     return uri.resolve(endpoint).toString();
   }
 
+  // ============================================
+  // ERROR HANDLER
+  // ============================================
   Never _handleError(DioException e) {
     debugPrint('==================== API ERROR ====================');
     debugPrint('STATUS  : ${e.response?.statusCode}');
